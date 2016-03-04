@@ -1,4 +1,4 @@
-package org.wlfek.push.Domain;
+package org.wlfek.push.domain;
 
 public class AppInfo {
 	
