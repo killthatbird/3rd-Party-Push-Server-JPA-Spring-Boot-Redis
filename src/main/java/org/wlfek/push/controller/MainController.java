@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.wlfek.push.component.ScheduledTasks;
 import org.wlfek.push.domain.GcmInfo;
-import org.wlfek.push.service.MainService;
 
 @Controller
 @RequestMapping("/")
