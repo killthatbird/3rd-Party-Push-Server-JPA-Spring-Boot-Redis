@@ -7,7 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.wlfek.push.component.ScheduledTasks;
-import org.wlfek.push.domain.GcmInfo;
+import org.wlfek.push.domain.GcmAppInfo;
+import org.wlfek.push.domain.GcmDeviceInfo;
 
 @Controller
 @RequestMapping("/")
@@ -23,7 +24,7 @@ public class MainController {
 	}
 	 
 	@RequestMapping("/renewalGcmInfo")
-	public @ResponseBody List<GcmInfo> getGcmInfo(){
+	public @ResponseBody List<GcmAppInfo> getGcmInfo(){
 		return scheduledTasks.renewalGcmInfo();
 	}
 
