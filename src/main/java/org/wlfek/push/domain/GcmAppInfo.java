@@ -21,14 +21,19 @@ import lombok.Data;
 public class GcmAppInfo {
 
 	@Id
+	@Column(length = 20)
 	private String appCode;
 	
+	@Column(length = 64)
 	private String appName;
 	
+	@Column(length = 256)
 	private String regId;
 	
+	@Column(length = 32)
 	private String apiKey;
 	
+	@Column(length = 1)
 	private int retryCnt;
 	
 	@Temporal(TemporalType.TIMESTAMP)
