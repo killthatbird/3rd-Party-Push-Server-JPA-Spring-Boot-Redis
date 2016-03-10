@@ -17,20 +17,20 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="GCM_APP_INFO")
-public class GcmAppInfo {
+@Table(name="GCM_APP")
+public class GcmApp {
 
 	@Id
-	@Column(length = 20)
+	@Column(length = 20, nullable = false)
 	private String appCode;
 	
-	@Column(length = 64)
+	@Column(length = 64, nullable = false)
 	private String appName;
 	
-	@Column(length = 256)
+	@Column(length = 256, nullable = false)
 	private String regId;
 	
-	@Column(length = 32)
+	@Column(length = 32, nullable = false)
 	private String apiKey;
 	
 	@Column(length = 1)
@@ -40,6 +40,6 @@ public class GcmAppInfo {
 	private Date regDate;
 	
 	@OneToMany(mappedBy = "gcmAppInfo")
-	List<GcmSendInfo> sendList = new ArrayList<GcmSendInfo>();
+	private List<GcmSend> sendList = new ArrayList<GcmSend>();
 	
 }

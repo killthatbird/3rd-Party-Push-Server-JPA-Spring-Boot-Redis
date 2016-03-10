@@ -14,24 +14,25 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
-import org.wlfek.push.domain.GcmAppInfo;
-import org.wlfek.push.domain.GcmDeviceInfo;
-import org.wlfek.push.domain.GcmSendInfo;
-import org.wlfek.push.repository.GcmInfoRepository;
+import org.wlfek.push.domain.GcmApp;
+import org.wlfek.push.domain.GcmDevice;
+import org.wlfek.push.domain.GcmSend;
+
+import org.wlfek.push.repository.GcmAppRepository;
 import org.wlfek.push.repository.GcmSendRepository;
 
 import com.google.android.gcm.server.Sender;
 
 @Component("myBean")
 public class ScheduledTasks {
-	
+
 	@Autowired
-	private GcmInfoRepository gcmInfoRepository;
+	private GcmAppRepository gcmInfoRepository;
 	
 	@Autowired
 	GcmSendRepository gcmSendRepository;
 	
-	private List<GcmAppInfo> gcmInfoList;
+	private List<GcmApp> gcmInfoList;
 	private Sender sender;
 	
 	protected EntityManager entityManager;
@@ -58,7 +59,7 @@ public class ScheduledTasks {
 	 * gcm apiKey 나 registation_id 를 교체시 미리 메모리 올려 놓은 gcm 리스트 조회시 호출
 	 * return 갱신된 정보
 	 */
-	public List<GcmAppInfo> renewalGcmInfo(){
+	public List<GcmApp> renewalGcmInfo(){
 		return gcmInfoList = gcmInfoRepository.findAll();
 	}
 	
@@ -66,11 +67,11 @@ public class ScheduledTasks {
 	@Transactional
 	public void checkPushMessage() throws DataAccessException {
 		System.out.println("The time is now " + dateFormat.format(new Date()));
-		List<GcmSendInfo> result = gcmSendRepository.findByStatusCode(1);
+		List<GcmSend> result = gcmSendRepository.findByStatusCode(1);
 		if(result.size() > 0) {
 			//push data 읽어서 queue 적재
 			//redis 적재
-			for(GcmSendInfo gsi : result){
+			for(GcmSend gsi : result){
 				gsi.setStatusCode(3);
 				gcmSendRepository.save(gsi);
 			}
