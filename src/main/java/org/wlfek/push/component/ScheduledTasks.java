@@ -102,13 +102,15 @@ public class ScheduledTasks {
 		}
 	}
 	
-	public Result sendGcmPush(){
+	public Result sendGcmPush(GcmSend gcmSend){
 		Result sendResult = null;
-//		Message message = new Message.Builder()
-//				.addData("", "");
+		Message message = new Message.Builder()
+									 .addData("Message", gcmSend.getMessage())
+									 .addData("Title", gcmSend.getTitle())									 
+									 .build();
 		
 		try {
-	
+			//sender.send(message, token ,5); 
 		} catch(Exception e) {
 			
 		}
