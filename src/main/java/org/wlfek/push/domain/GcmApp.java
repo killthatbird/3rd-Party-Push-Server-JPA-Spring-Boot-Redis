@@ -41,5 +41,13 @@ public class GcmApp {
 	
 	@OneToMany(mappedBy = "gcmAppInfo")
 	private List<GcmSend> sendList = new ArrayList<GcmSend>();
+
+	@Override
+	public String toString() {
+		return "GcmApp [appCode=" + appCode + ", appName=" + appName + ", regId=" + regId + ", apiKey=" + apiKey
+				+ ", retryCnt=" + retryCnt + ", regDate=" + regDate + "]";
+	}
+	
+	
 	
 }

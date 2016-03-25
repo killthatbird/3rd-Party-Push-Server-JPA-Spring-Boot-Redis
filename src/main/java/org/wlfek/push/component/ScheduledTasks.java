@@ -1,9 +1,19 @@
+/**
+ * AUTHOR : Yang Min Kyu
+ * DATE   : 2016. 3. 23.
+ * TITLE  :  gcm task
+ * MAIL   : wlfekymk@gmail.com
+ *
+**/
 package org.wlfek.push.component;
 
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -13,24 +23,33 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.wlfek.push.domain.GcmApp;
 import org.wlfek.push.domain.GcmDevice;
 import org.wlfek.push.domain.GcmSend;
 
-import org.wlfek.push.repository.GcmAppRepository;
-import org.wlfek.push.repository.GcmSendRepository;
+import org.wlfek.push.repository.AppRepository;
+import org.wlfek.push.repository.SendRepository;
+import org.wlfek.push.repository.impl.CustomSendRepository;
 
+import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 
 @Component("myBean")
 public class ScheduledTasks {
 
 	@Autowired
-	private GcmAppRepository gcmInfoRepository;
+	private AppRepository gcmInfoRepository;
 	
 	@Autowired
-	GcmSendRepository gcmSendRepository;
+	private SendRepository gcmSendRepository;
+
+	@Autowired
+	private CustomSendRepository customSendRepository;
+	
+	private Queue<?> gcmSendQueue;
 	
 	private List<GcmApp> gcmInfoList;
 	private Sender sender;
@@ -51,8 +70,8 @@ public class ScheduledTasks {
 	
 	@PostConstruct
 	public void initialize(){
-		//sender = new Sender();
 		gcmInfoList = gcmInfoRepository.findAll();
+		gcmSendQueue = new LinkedList<>();
 	}
 	
 	/**
@@ -67,7 +86,11 @@ public class ScheduledTasks {
 	@Transactional
 	public void checkPushMessage() throws DataAccessException {
 		System.out.println("The time is now " + dateFormat.format(new Date()));
-		List<GcmSend> result = gcmSendRepository.findByStatusCode(1);
+		//List<GcmSend> result = gcmSendRepository.findByStatusCode(1);
+	
+		List<GcmSend> result = customSendRepository.sendList(1);
+		
+		
 		if(result.size() > 0) {
 			//push data 읽어서 queue 적재
 			//redis 적재
@@ -79,7 +102,17 @@ public class ScheduledTasks {
 		}
 	}
 	
-	public void sendGcmPush(){
+	public Result sendGcmPush(){
+		Result sendResult = null;
+//		Message message = new Message.Builder()
+//				.addData("", "");
 		
+		try {
+	
+		} catch(Exception e) {
+			
+		}
+		return sendResult;
 	}
+
 }

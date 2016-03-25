@@ -51,8 +51,8 @@
             <constraint>
               <height>-1</height>
               <width>-1</width>
-              <x>500</x>
-              <y>314</y>
+              <x>490</x>
+              <y>300</y>
             </constraint>
             <sourceConnections>
               <net.java.amateras.db.visual.model.ForeignKeyModel reference="../../.."/>
@@ -190,6 +190,22 @@
             <description>push 발송을 위한 적재 table</description>
             <columns>
               <net.java.amateras.db.visual.model.ColumnModel>
+                <columnName>ID</columnName>
+                <logicalName>Id</logicalName>
+                <columnType class="net.java.amateras.db.dialect.ColumnType">
+                  <name>INTEGER</name>
+                  <logicalName>Integer</logicalName>
+                  <supportSize>false</supportSize>
+                  <type>4</type>
+                </columnType>
+                <size>10</size>
+                <notNull>true</notNull>
+                <primaryKey>true</primaryKey>
+                <description></description>
+                <autoIncrement>true</autoIncrement>
+                <defaultValue></defaultValue>
+              </net.java.amateras.db.visual.model.ColumnModel>
+              <net.java.amateras.db.visual.model.ColumnModel>
                 <columnName>APP_CODE</columnName>
                 <logicalName>APP_CODE</logicalName>
                 <columnType class="net.java.amateras.db.dialect.ColumnType">
@@ -200,7 +216,7 @@
                 </columnType>
                 <size>20</size>
                 <notNull>true</notNull>
-                <primaryKey>true</primaryKey>
+                <primaryKey>false</primaryKey>
                 <description>APP CODE (EX : SGORI_ANDROID)</description>
                 <autoIncrement>false</autoIncrement>
                 <defaultValue></defaultValue>
@@ -208,10 +224,10 @@
               <net.java.amateras.db.visual.model.ColumnModel>
                 <columnName>TOKEN</columnName>
                 <logicalName>TOKEN</logicalName>
-                <columnType class="net.java.amateras.db.dialect.ColumnType" reference="../../net.java.amateras.db.visual.model.ColumnModel/columnType"/>
+                <columnType class="net.java.amateras.db.dialect.ColumnType" reference="../../net.java.amateras.db.visual.model.ColumnModel[2]/columnType"/>
                 <size>256</size>
                 <notNull>true</notNull>
-                <primaryKey>true</primaryKey>
+                <primaryKey>false</primaryKey>
                 <description>Mobile Device Token</description>
                 <autoIncrement>false</autoIncrement>
                 <defaultValue></defaultValue>
@@ -380,7 +396,12 @@
         <net.java.amateras.db.visual.model.ColumnModel>
           <columnName>USER_INFO</columnName>
           <logicalName>USER_INFO</logicalName>
-          <columnType class="net.java.amateras.db.dialect.ColumnType" reference="../../../targetConnections/net.java.amateras.db.visual.model.ForeignKeyModel/source/columns/net.java.amateras.db.visual.model.ColumnModel/columnType"/>
+          <columnType class="net.java.amateras.db.dialect.ColumnType">
+            <name>VARCHAR</name>
+            <logicalName>String</logicalName>
+            <supportSize>true</supportSize>
+            <type>12</type>
+          </columnType>
           <size>14</size>
           <notNull>true</notNull>
           <primaryKey>false</primaryKey>
@@ -440,7 +461,7 @@
         <net.java.amateras.db.visual.model.ColumnModel>
           <columnName>BADGE</columnName>
           <logicalName>BADGE</logicalName>
-          <columnType class="net.java.amateras.db.dialect.ColumnType" reference="../../../targetConnections/net.java.amateras.db.visual.model.ForeignKeyModel/source/columns/net.java.amateras.db.visual.model.ColumnModel[10]/columnType"/>
+          <columnType class="net.java.amateras.db.dialect.ColumnType" reference="../../../targetConnections/net.java.amateras.db.visual.model.ForeignKeyModel/source/columns/net.java.amateras.db.visual.model.ColumnModel[11]/columnType"/>
           <size>10</size>
           <notNull>true</notNull>
           <primaryKey>false</primaryKey>
