@@ -92,6 +92,7 @@ public class ScheduledTasks {
 			logger.info("Gcm List >>>> ", gcmSendList);
 			//push data 읽어서 queue 적재
 			//redis 적재
+			
 			for(GcmSend gcmSend : gcmSendList){
 				pushSendQueueAdd(gcmSend);
 				logger.info("queue에 적재후 status 3 업데이트");;
@@ -99,7 +100,10 @@ public class ScheduledTasks {
 				gcmSendRepository.save(gcmSend);
 			}
 			gcmSendRepository.flush();
+			
+			sendGcmPushMulti(gcmSendList);
 		}
+		
 	}
 	
 	public void pushSendQueueAdd(GcmSend gcmSend){
@@ -114,20 +118,20 @@ public class ScheduledTasks {
 
 	public void sendGcmPushMulti(List<GcmSend> gcmSendList){
 		Message message = null;
-		List<String> tokenList = new ArrayList<String>();
+		List<String> regIdList = new ArrayList<String>();
 		if(gcmSendList != null && gcmSendList.size() > 0){
-			for(GcmSend gs: gcmSendList){
+			for(GcmSend gcmSend: gcmSendList){
 				message = new Message.Builder()
-									 .addData("Message", gs.getMessage())
-									 .addData("Title", gs.getTitle())									 
+									 .addData("Message", gcmSend.getMessage())
+									 .addData("Title", gcmSend.getTitle())									 
 									 .build();
-				tokenList.add(gs.getGcmDeviceInfo().getRegId());
+				regIdList.add(gcmSend.getGcmDeviceInfo().getRegId());
 			}
 		}
 		
 		try {
-			if (tokenList.size() > 0) {
-				MulticastResult multicastResult = sender.send(message, tokenList, 5);	
+			if (regIdList.size() > 0) {
+				MulticastResult multicastResult = sender.send(message, regIdList, 5);	
 				if (multicastResult != null && multicastResult.getTotal() > 0 ) {
 	
 				}
