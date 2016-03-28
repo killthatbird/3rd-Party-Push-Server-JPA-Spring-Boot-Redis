@@ -27,10 +27,10 @@ public class GcmApp {
 	@Column(length = 64, nullable = false)
 	private String appName;
 	
-	@Column(length = 256, nullable = false)
-	private String regId;
+	@Column(length = 64, nullable = false)
+	private String apiId;
 	
-	@Column(length = 32, nullable = false)
+	@Column(length = 64, nullable = false)
 	private String apiKey;
 	
 	@Column(length = 1)
@@ -44,10 +44,7 @@ public class GcmApp {
 
 	@Override
 	public String toString() {
-		return "GcmApp [appCode=" + appCode + ", appName=" + appName + ", regId=" + regId + ", apiKey=" + apiKey
-				+ ", retryCnt=" + retryCnt + ", regDate=" + regDate + "]";
+		return "GcmApp [appCode=" + appCode + ", appName=" + appName + ", apiId=" + apiId + ", apiKey=" + apiKey
+				+ ", retryCnt=" + retryCnt + ", regDate=" + regDate + ", sendList=" + sendList + "]";
 	}
-	
-	
-	
 }

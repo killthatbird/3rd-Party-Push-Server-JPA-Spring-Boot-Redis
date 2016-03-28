@@ -22,8 +22,8 @@ import lombok.Data;
 public class GcmDevice {
 	
 	@Id
-	@Column(length = 128)
-	private String token;
+	@Column(length = 160)
+	private String regId;
 	
 	@Column(length = 32)
 	private String userInfo;
@@ -42,8 +42,7 @@ public class GcmDevice {
 	public void addSendMessage(GcmSend gcmSendInfo){
 		gcmSendInfos.add(gcmSendInfo);
 		gcmSendInfo.setGcmDeviceInfo(this);
-	}
-	
+	}	
 }
 
 enum PushStatus{

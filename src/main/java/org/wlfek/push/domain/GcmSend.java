@@ -33,7 +33,7 @@ public class GcmSend {
 	private GcmApp gcmAppInfo; 
 	
 	@ManyToOne
-	@JoinColumn(name = "TOKEN")
+	@JoinColumn(name = "REG_ID")
 	private GcmDevice gcmDeviceInfo;
 	
 	private String title;
@@ -46,7 +46,4 @@ public class GcmSend {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date regDate;
-	
-	
-	
 }

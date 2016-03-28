@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.support.QueryDslRepositorySupport
 import org.springframework.util.StringUtils;
 import org.wlfek.push.domain.GcmSend;
 import org.wlfek.push.domain.QGcmApp;
+import org.wlfek.push.domain.QGcmDevice;
 import org.wlfek.push.domain.QGcmSend;
 import com.mysema.query.jpa.JPQLQuery;
 
@@ -20,11 +21,13 @@ public class SendRepositoryImpl extends QueryDslRepositorySupport implements Cus
 	public List<GcmSend> sendList(int statusCode){
 		QGcmSend gcmSend =  QGcmSend.gcmSend;
 		QGcmApp gcmApp = QGcmApp.gcmApp;
+		QGcmDevice gcmDevice = QGcmDevice.gcmDevice;
 		
 		JPQLQuery query = from(gcmSend);
 		if(StringUtils.hasText(String.valueOf(statusCode))){
-			query.leftJoin(gcmSend.gcmAppInfo, gcmApp)
-			.where(gcmSend.statusCode.eq(statusCode));
+			query.join(gcmSend.gcmAppInfo, gcmApp)
+			     .join(gcmSend.gcmDeviceInfo, gcmDevice)
+			     .where(gcmSend.statusCode.eq(statusCode));
 		}
 		return query.list(gcmSend);
 	}
