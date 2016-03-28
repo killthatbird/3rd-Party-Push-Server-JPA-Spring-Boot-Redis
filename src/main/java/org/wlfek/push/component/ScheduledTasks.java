@@ -43,7 +43,7 @@ public class ScheduledTasks {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
-	private AppRepository gcmInfoRepository;
+	private AppRepository gcmAppRepository;
 	
 	@Autowired
 	private SendRepository gcmSendRepository;
@@ -53,7 +53,7 @@ public class ScheduledTasks {
 	
 	private Queue<GcmSend> gcmSendQueue;
 	
-	private List<GcmApp> gcmInfoList;
+	private List<GcmApp> gcmAppList;
 	private Sender sender;
 	
 	protected EntityManager entityManager;
@@ -69,7 +69,8 @@ public class ScheduledTasks {
 	
 	@PostConstruct
 	public void initialize(){
-		gcmInfoList = gcmInfoRepository.findAll();
+		logger.info("App List Info Load", "" );
+		gcmAppList = gcmAppRepository.findAll();
 		gcmSendQueue = new LinkedList<GcmSend>();
 	}
 	
@@ -78,7 +79,7 @@ public class ScheduledTasks {
 	 * return 갱신된 정보
 	 */
 	public List<GcmApp> renewalGcmInfo(){
-		return gcmInfoList = gcmInfoRepository.findAll();
+		return gcmAppList = gcmAppRepository.findAll();
 	}
 	
 	
