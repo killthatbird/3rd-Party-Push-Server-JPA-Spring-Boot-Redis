@@ -98,9 +98,9 @@ public class ScheduledTasks {
 			GcmSend singleGcmSend = null;
 			while ((singleGcmSend = gcmSendQueue.poll()) != null) {
 				setSender(singleGcmSend);
-				Result result = sendGcmPushSingle(singleGcmSend);
-				logger.info(result.getMessageId());
-				logger.info(result.getCanonicalRegistrationId());
+				logger.info(singleGcmSend.getGcmDeviceInfo().getRegId());
+				sendGcmPushSingle(singleGcmSend);
+				
 			} 
 		}
 	}
@@ -111,7 +111,7 @@ public class ScheduledTasks {
 			System.out.println("MultiSender Size : " + listGcmSendQueue.size());
 			List<GcmSend> multiGcmSend = null;
 			while ((multiGcmSend = listGcmSendQueue.poll()) != null) {
-				//setSender(multiGcmSend);
+				setSender(multiGcmSend.get(0));
 				sendGcmPushMulti(multiGcmSend);
 			} 
 		}
@@ -215,7 +215,7 @@ public class ScheduledTasks {
 			if (regIdList.size() > 0) {
 				MulticastResult multicastResult = sender.send(message, regIdList, 5);	
 				if (multicastResult != null && multicastResult.getTotal() > 0 ) {
-	
+					
 				}
 			}
 		} catch (Exception e) {
