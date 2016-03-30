@@ -9,6 +9,7 @@ import org.wlfek.push.domain.QGcmApp;
 import org.wlfek.push.domain.QGcmDevice;
 import org.wlfek.push.domain.QGcmSend;
 import com.mysema.query.jpa.JPQLQuery;
+import com.mysema.query.types.OrderSpecifier;
 
 
 public class SendRepositoryImpl extends QueryDslRepositorySupport implements CustomSendRepository{
@@ -27,8 +28,9 @@ public class SendRepositoryImpl extends QueryDslRepositorySupport implements Cus
 		if(StringUtils.hasText(String.valueOf(statusCode))){
 			query.join(gcmSend.gcmAppInfo, gcmApp)
 			     .join(gcmSend.gcmDeviceInfo, gcmDevice)
-			     .where(gcmSend.statusCode.eq(statusCode));
+			     .where(gcmSend.statusCode.eq(statusCode))
+			     .orderBy(gcmSend.id.asc());
 		}
 		return query.list(gcmSend);
 	}
-}
+}			

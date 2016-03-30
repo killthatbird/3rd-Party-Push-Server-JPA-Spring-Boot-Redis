@@ -41,6 +41,9 @@ public class GcmSend {
 	@Column(length = 1024)
 	private String message;
 	
+	@Column
+	private Long groupId;
+	
 	//@Enumerated(EnumType.STRING)
 	private int statusCode;
 

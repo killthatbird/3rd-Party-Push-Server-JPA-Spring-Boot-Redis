@@ -7,10 +7,8 @@
 **/
 package org.wlfek.push.component;
 
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -25,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.wlfek.push.domain.GcmApp;
 import org.wlfek.push.domain.GcmSend;
@@ -35,7 +34,10 @@ import org.wlfek.push.repository.impl.CustomSendRepository;
 
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.MulticastResult;
+import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
+
+import redis.clients.jedis.Jedis;
 
 @Component("myBean")
 public class ScheduledTasks {
@@ -51,7 +53,13 @@ public class ScheduledTasks {
 	@Autowired
 	private CustomSendRepository customSendRepository;
 	
-	private Queue<GcmSend> gcmSendQueue;
+	Jedis jedis = new Jedis("localhost");
+	
+	@Autowired
+	private RedisTemplate<String, String> redisTemplate;
+	
+	private Queue<GcmSend> gcmSendQueue; // 단건용 message queue
+	private Queue<List<GcmSend>> listGcmSendQueue; // 여러건 발송용 message queue
 	
 	private List<GcmApp> gcmAppList;
 	private Sender sender;
@@ -69,9 +77,10 @@ public class ScheduledTasks {
 	
 	@PostConstruct
 	public void initialize(){
-		logger.info("App List Info Load", "" );
 		gcmAppList = gcmAppRepository.findAll();
+		logger.info("App List Info Load", gcmAppList.toString());
 		gcmSendQueue = new LinkedList<GcmSend>();
+		listGcmSendQueue = new LinkedList<List<GcmSend>>();
 	}
 	
 	/**
@@ -82,29 +91,86 @@ public class ScheduledTasks {
 		return gcmAppList = gcmAppRepository.findAll();
 	}
 	
+	@Transactional
+	public void gcmSingleSender(){
+		synchronized (gcmSendQueue) {
+			System.out.println("SingleSender Size : " + gcmSendQueue.size());
+			GcmSend singleGcmSend = null;
+			while ((singleGcmSend = gcmSendQueue.poll()) != null) {
+				setSender(singleGcmSend);
+				Result result = sendGcmPushSingle(singleGcmSend);
+				logger.info(result.getMessageId());
+				logger.info(result.getCanonicalRegistrationId());
+			} 
+		}
+	}
 	
 	@Transactional
-	public void checkPushMessage() throws DataAccessException {
-
+	public void gcmMultiSender(){
+		synchronized (listGcmSendQueue) {
+			System.out.println("MultiSender Size : " + listGcmSendQueue.size());
+			List<GcmSend> multiGcmSend = null;
+			while ((multiGcmSend = listGcmSendQueue.poll()) != null) {
+				//setSender(multiGcmSend);
+				sendGcmPushMulti(multiGcmSend);
+			} 
+		}
+	}
+	
+	@Transactional
+	public void checkPushMessageAndAddQueue() throws DataAccessException {
 		// 보낼 push data 조회 status가 1인 것만
 		List<GcmSend> gcmSendList = customSendRepository.sendList(1);
 		// 조회할 내용이 있으면
 		if(gcmSendList.size() > 0) {
 			logger.info("Gcm List >>>> ", gcmSendList);
 			//push data 읽어서 queue 적재
-			//redis 적재
+			//차후 redis에 적재할 예정
+		//	pushSendQueueListAdd(gcmSendList);
+		//	redisTemplate.opsForValue().multiSet(gcmSendList);
+			//jedis.rpush(key, strings)
+			List<GcmSend> gcmMultiSendList = new ArrayList<>();
+			long beforeGroupId = 0;
+			
+			logger.info("DB 조회 했을때 총 건수 : "+ gcmSendList.size());
 			
 			for(GcmSend gcmSend : gcmSendList){
-				pushSendQueueAdd(gcmSend);
-				logger.info("queue에 적재후 status 3 업데이트");;
+				if(gcmSend.getGroupId()!=null){
+					logger.info("groupId : "+ gcmSend.getGroupId());
+					if(beforeGroupId != gcmSend.getGroupId()){
+						logger.info("gcmMultiSendList.size()  : " + gcmMultiSendList.size() );
+						if(gcmMultiSendList.size() > 0){
+							pushSendQueueListAdd(gcmMultiSendList);
+						}
+						//초기화
+						gcmMultiSendList = new ArrayList<>();
+						beforeGroupId = gcmSend.getGroupId();
+					} 
+					gcmMultiSendList.add(gcmSend);
+				} else {
+					pushSendQueueAdd(gcmSend);
+				}
+				
+				logger.info("queue에 적재후 status 3 업데이트");
 				gcmSend.setStatusCode(3);
 				gcmSendRepository.save(gcmSend);
 			}
-			gcmSendRepository.flush();
 			
-			sendGcmPushMulti(gcmSendList);
+			if(gcmMultiSendList.size() > 0){
+				pushSendQueueListAdd(gcmMultiSendList);
+			}
+			
+			logger.info("단건 큐 사이즈 : "+ gcmSendQueue.size());
+			logger.info("리스트형 건 큐 사이즈 : "+ listGcmSendQueue.size());
+			gcmSendRepository.flush();
 		}
 		
+	}
+	
+	public void pushSendQueueListAdd(List<GcmSend> listGcmSend){
+		synchronized (listGcmSendQueue) {
+			listGcmSendQueue.offer(listGcmSend);
+		}
 	}
 	
 	public void pushSendQueueAdd(GcmSend gcmSend){
@@ -115,6 +181,21 @@ public class ScheduledTasks {
 	
 	public void setSender(GcmSend gcmSend){
 		sender = new Sender(gcmSend.getGcmAppInfo().getApiKey());
+	}
+	
+	public Result sendGcmPushSingle(GcmSend gcmSend){
+		Result sendReuslt = null;
+		Message message = null;
+		message = new Message.Builder()
+				 .addData("Message", gcmSend.getMessage())
+				 .addData("Title", gcmSend.getTitle())									 
+				 .build();
+		try {
+			sendReuslt = sender.send(message, gcmSend.getGcmDeviceInfo().getRegId(), 5);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return sendReuslt;
 	}
 
 	public void sendGcmPushMulti(List<GcmSend> gcmSendList){
@@ -138,7 +219,7 @@ public class ScheduledTasks {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Error message : ", e.getMessage());
+			logger.error(e.getMessage());
 		}
 	}
 

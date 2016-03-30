@@ -45,6 +45,6 @@ public class GcmApp {
 	@Override
 	public String toString() {
 		return "GcmApp [appCode=" + appCode + ", appName=" + appName + ", apiId=" + apiId + ", apiKey=" + apiKey
-				+ ", retryCnt=" + retryCnt + ", regDate=" + regDate + ", sendList=" + sendList + "]";
+				+ ", retryCnt=" + retryCnt + ", regDate=" + regDate +  "]";
 	}
 }
