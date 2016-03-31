@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.wlfek.push.domain.GcmApp;
@@ -37,8 +38,6 @@ import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 
-import redis.clients.jedis.Jedis;
-
 @Component("myBean")
 public class ScheduledTasks {
 	
@@ -52,8 +51,6 @@ public class ScheduledTasks {
 
 	@Autowired
 	private CustomSendRepository customSendRepository;
-	
-	Jedis jedis = new Jedis("localhost");
 	
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
@@ -82,6 +79,7 @@ public class ScheduledTasks {
 		gcmSendQueue = new LinkedList<GcmSend>();
 		listGcmSendQueue = new LinkedList<List<GcmSend>>();
 	}
+		
 	
 	/**
 	 * gcm apiKey 나 registation_id 를 교체시 미리 메모리 올려 놓은 gcm 리스트 조회시 호출
@@ -128,7 +126,9 @@ public class ScheduledTasks {
 			//차후 redis에 적재할 예정
 		//	pushSendQueueListAdd(gcmSendList);
 		//	redisTemplate.opsForValue().multiSet(gcmSendList);
-			//jedis.rpush(key, strings)
+		//jedis.rpush(key, strings)
+		//ListOperations<String, GcmSend> list;
+		//	redisTemplate.					
 			List<GcmSend> gcmMultiSendList = new ArrayList<>();
 			long beforeGroupId = 0;
 			
@@ -136,9 +136,9 @@ public class ScheduledTasks {
 			
 			for(GcmSend gcmSend : gcmSendList){
 				if(gcmSend.getGroupId()!=null){
-					logger.info("groupId : "+ gcmSend.getGroupId());
+					logger.debug("groupId : "+ gcmSend.getGroupId());
 					if(beforeGroupId != gcmSend.getGroupId()){
-						logger.info("gcmMultiSendList.size()  : " + gcmMultiSendList.size() );
+						logger.debug("gcmMultiSendList.size()  : " + gcmMultiSendList.size() );
 						if(gcmMultiSendList.size() > 0){
 							pushSendQueueListAdd(gcmMultiSendList);
 						}
@@ -149,9 +149,9 @@ public class ScheduledTasks {
 					gcmMultiSendList.add(gcmSend);
 				} else {
 					pushSendQueueAdd(gcmSend);
+					
 				}
 				
-				logger.info("queue에 적재후 status 3 업데이트");
 				gcmSend.setStatusCode(3);
 				gcmSendRepository.save(gcmSend);
 			}
@@ -168,12 +168,16 @@ public class ScheduledTasks {
 	}
 	
 	public void pushSendQueueListAdd(List<GcmSend> listGcmSend){
+		List<String> stringList = new ArrayList<>();
+		listGcmSend.stream().forEach(gcmSend -> stringList.add(gcmSend.toString()));
+		redisTemplate.opsForList().rightPushAll("listSendQueue", stringList);
 		synchronized (listGcmSendQueue) {
 			listGcmSendQueue.offer(listGcmSend);
 		}
 	}
 	
 	public void pushSendQueueAdd(GcmSend gcmSend){
+		redisTemplate.opsForList().rightPush("sendQueue", gcmSend.toString());
 		synchronized (gcmSendQueue) {
 			gcmSendQueue.offer(gcmSend);
 		}
