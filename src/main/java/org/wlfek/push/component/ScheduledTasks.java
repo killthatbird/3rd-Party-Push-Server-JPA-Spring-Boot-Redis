@@ -53,8 +53,6 @@ public class ScheduledTasks {
 	@Autowired
 	private CustomSendRepository customSendRepository;
 	
-	Jedis jedis = new Jedis("localhost");
-	
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
 	
@@ -168,12 +166,16 @@ public class ScheduledTasks {
 	}
 	
 	public void pushSendQueueListAdd(List<GcmSend> listGcmSend){
+		List<String> stringList = new ArrayList<>();
+		listGcmSend.stream().forEach(gcmSend -> stringList.add(gcmSend.toString()));
+		redisTemplate.opsForList().rightPushAll("listSendQueue", stringList);
 		synchronized (listGcmSendQueue) {
 			listGcmSendQueue.offer(listGcmSend);
 		}
 	}
 	
 	public void pushSendQueueAdd(GcmSend gcmSend){
+		redisTemplate.opsForList().rightPush("sendQueue", gcmSend.toString());
 		synchronized (gcmSendQueue) {
 			gcmSendQueue.offer(gcmSend);
 		}

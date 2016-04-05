@@ -14,20 +14,20 @@ import redis.clients.jedis.JedisPoolConfig;
 public class RedisConfig {
 
 //	@Bean
-//	public RedisConnectionFactory jedisConnectionFactory() {
-//		JedisPoolConfig poolConfig = new JedisPoolConfig();
-//		poolConfig.setMaxTotal(5);
-//		poolConfig.setTestOnBorrow(true);
-//		poolConfig.setTestOnReturn(true);
-//		JedisConnectionFactory ob = new JedisConnectionFactory(poolConfig);
-//		ob.setUsePool(true);
-//		ob.setHostName("localhost");
-//		ob.setPort(6379);
-//		return ob;
-//	}
-//	
-//	@Bean
-//	public StringRedisTemplate stringRedisTemplate(){
-//		return new StringRedisTemplate(jedisConnectionFactory());
-//	}
+	public RedisConnectionFactory jedisConnectionFactory() {
+		JedisPoolConfig poolConfig = new JedisPoolConfig();
+		poolConfig.setMaxTotal(5);
+		poolConfig.setTestOnBorrow(true);
+		poolConfig.setTestOnReturn(true);
+		JedisConnectionFactory ob = new JedisConnectionFactory(poolConfig);
+		ob.setUsePool(true);
+		ob.setHostName("localhost");
+		ob.setPort(6379);
+		return ob;
+	}
+	
+	@Bean
+	public StringRedisTemplate stringRedisTemplate(){
+		return new StringRedisTemplate(jedisConnectionFactory());
+	}
 }
