@@ -13,7 +13,7 @@ import redis.clients.jedis.JedisPoolConfig;
 @EnableAutoConfiguration
 public class RedisConfig {
 
-//	@Bean
+	@Bean
 	public RedisConnectionFactory jedisConnectionFactory() {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		poolConfig.setMaxTotal(5);
