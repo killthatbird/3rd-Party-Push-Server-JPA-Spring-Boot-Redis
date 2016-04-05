@@ -42,14 +42,7 @@ public class GcmDevice {
 	public void addSendMessage(GcmSend gcmSendInfo){
 		gcmSendInfos.add(gcmSendInfo);
 		gcmSendInfo.setGcmDeviceInfo(this);
-	}
-
-	@Override
-	public String toString() {
-		return "GcmDevice [regId=" + regId + ", userInfo=" + userInfo + ", regStatus=" + regStatus + ", badge=" + badge
-				+ ", regDate=" + regDate + "]";
 	}	
-	
 }
 
 enum PushStatus{
