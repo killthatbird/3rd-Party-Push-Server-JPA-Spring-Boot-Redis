@@ -66,6 +66,7 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 		</dependency>
+		<!-- QueryDSL -->
 		<dependency>
 		  <groupId>com.mysema.querydsl</groupId>
 		  <artifactId>querydsl-apt</artifactId>
@@ -77,10 +78,16 @@
 			<artifactId>querydsl-jpa</artifactId>
 			<version>3.7.2</version>
 		</dependency>
+		<!-- Logger -->
 		<dependency>
 		  <groupId>org.slf4j</groupId>
 		  <artifactId>slf4j-log4j12</artifactId>
 		</dependency>
+		<!-- DBCP -->
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+		</dependency>		
 	</dependencies>
 	
 	<build>

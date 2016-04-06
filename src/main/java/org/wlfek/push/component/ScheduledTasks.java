@@ -61,18 +61,18 @@ public class ScheduledTasks {
 	
 	private List<GcmApp> gcmAppList;
 	private Sender sender;
-	
-	protected EntityManager entityManager;
-	 
-	public EntityManager getEntityManager() {
-		return entityManager;
-	}
-	
-	@PersistenceContext
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
-	
+//	
+//	protected EntityManager entityManager;
+//	 
+//	public EntityManager getEntityManager() {
+//		return entityManager;
+//	}
+//	
+//	@PersistenceContext
+//	public void setEntityManager(EntityManager entityManager) {
+//		this.entityManager = entityManager;
+//	}
+//	
 	@PostConstruct
 	public void initialize(){
 		gcmAppList = gcmAppRepository.findAll();
@@ -206,9 +206,9 @@ public class ScheduledTasks {
 		if(gcmSendList != null && gcmSendList.size() > 0){
 			for(GcmSend gcmSend: gcmSendList){
 				message = new Message.Builder()
-									 .addData("Message", gcmSend.getMessage())
-									 .addData("Title", gcmSend.getTitle())									 
-									 .build();
+						 .addData("Message", gcmSend.getMessage())
+						 .addData("Title", gcmSend.getTitle())									 
+						 .build();
 				regIdList.add(gcmSend.getGcmDeviceInfo().getRegId());
 			}
 		}
@@ -223,6 +223,13 @@ public class ScheduledTasks {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+	}
+	
+	static <T> T nonNull(T argument) {
+		if (argument == null) {
+			throw new IllegalArgumentException("argument cannot be null");
+		}
+		return argument;
 	}
 
 }

@@ -1,12 +1,8 @@
 package org.wlfek.push;
 
 import java.util.Properties;
-
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -26,8 +22,7 @@ import com.zaxxer.hikari.HikariDataSource;
 // application.properties 보다 우선시 됨.
 @Configuration
 @EnableTransactionManagement
-//@EnableJpaRepositories(basePackages="org.wlfek.push", entityManagerFactoryRef="emf")
-public class JPAConfig {
+public class DatabaseConfig {
  
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
@@ -56,7 +51,7 @@ public class JPAConfig {
         return properties;
     }
  
-    // H2 DB 설정
+      // H2 DB 설정
 //    @Bean(destroyMethod = "shutdown")
 //    public EmbeddedDatabase dataSource() {
 //        return new EmbeddedDatabaseBuilder()
@@ -76,7 +71,6 @@ public class JPAConfig {
 //	    dataSource.setFastConnectionFailoverEnabled(true);
 //	    return dataSource;
 //	}
-	
     
     @Bean
     public DataSource dataSource(){
@@ -92,14 +86,13 @@ public class JPAConfig {
         hikariConfig.setMaximumPoolSize(5);
         hikariConfig.setConnectionTestQuery("SELECT 1");
         hikariConfig.setPoolName("springHikariCP");
-//        hikariConfig.addDataSourceProperty("dataSource.cachePrepStmts", "true");
-//        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSize", "250");
-//        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSqlLimit", "2048");
-//        hikariConfig.addDataSourceProperty("dataSource.useServerPrepStmts", "true");
+        hikariConfig.addDataSourceProperty("dataSource.cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSqlLimit", "2048");
+        hikariConfig.addDataSourceProperty("dataSource.useServerPrepStmts", "true");
         HikariDataSource hikariDs = new HikariDataSource(hikariConfig);
         return hikariDs;
     }   
-    
     
     // Transaction 설정
     @Bean

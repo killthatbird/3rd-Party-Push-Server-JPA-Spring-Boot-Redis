@@ -21,6 +21,7 @@ import lombok.Data;
 public class GcmApp {
 
 	@Id
+	
 	@Column(length = 20, nullable = false)
 	private String appCode;
 	
