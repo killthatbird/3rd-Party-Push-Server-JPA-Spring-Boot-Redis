@@ -2,12 +2,14 @@ package org.wlfek.push;
 
 import java.util.Properties;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -24,17 +26,18 @@ import com.zaxxer.hikari.HikariDataSource;
 // application.properties 보다 우선시 됨.
 @Configuration
 @EnableTransactionManagement
+//@EnableJpaRepositories(basePackages="org.wlfek.push", entityManagerFactoryRef="emf")
 public class JPAConfig {
  
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSource());	
-		em.setPackagesToScan(new String[] {"org.wlfek.push"});
+    	em.setDataSource(dataSource());	
+		em.setPackagesToScan("org.wlfek");
         // 각 구현체의 프로퍼티 확장 및 설정
         JpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(jpaVendorAdapter);
-        em.setJpaProperties(additionalJpaProperties());
+        em.setJpaProperties(additionalJpaProperties());	
         return em;
     }
     
@@ -42,13 +45,14 @@ public class JPAConfig {
      * 각 구현체의 프로퍼티 확장 및 설정
      * @return Properties
      */
-    private Properties additionalJpaProperties(){
+    Properties additionalJpaProperties(){
         Properties properties = new Properties();
-//        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL82Dialect");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         properties.setProperty("hibernate.hbm2ddl.auto", "create");
-        properties.setProperty("hibernate.generate-ddl", "false");
+        properties.setProperty("hibernate.generate-ddl", "true");
         properties.setProperty("hibernate.show_sql", "true");
-        properties.setProperty("hibernate.naming-strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
+        properties.setProperty("hibernate.ejb.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
+        properties.setProperty("hibernate.cache.provider_class", "org.hibernate.cache.NoCacheProvider");
         return properties;
     }
  
@@ -88,20 +92,21 @@ public class JPAConfig {
         hikariConfig.setMaximumPoolSize(5);
         hikariConfig.setConnectionTestQuery("SELECT 1");
         hikariConfig.setPoolName("springHikariCP");
-        hikariConfig.addDataSourceProperty("dataSource.cachePrepStmts", "true");
-        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSize", "250");
-        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSqlLimit", "2048");
-        hikariConfig.addDataSourceProperty("dataSource.useServerPrepStmts", "true");
+//        hikariConfig.addDataSourceProperty("dataSource.cachePrepStmts", "true");
+//        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSize", "250");
+//        hikariConfig.addDataSourceProperty("dataSource.prepStmtCacheSqlLimit", "2048");
+//        hikariConfig.addDataSourceProperty("dataSource.useServerPrepStmts", "true");
         HikariDataSource hikariDs = new HikariDataSource(hikariConfig);
         return hikariDs;
     }   
     
     
     // Transaction 설정
-//    @Bean
-//    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
-//        JpaTransactionManager transactionManager = new JpaTransactionManager();
-//        transactionManager.setEntityManagerFactory(emf);
-//        return transactionManager;
-//    }
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(emf);
+        return transactionManager;
+    }
+    
 }
