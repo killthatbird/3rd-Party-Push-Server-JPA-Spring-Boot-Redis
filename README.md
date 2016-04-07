@@ -25,6 +25,13 @@ Trouble Shooting Guide
     - 다시 maven update 하면 target/generated-sources/java 밑에 O*****.class 들이 잡힘.
     - 실제로 해당 클레스는 QueryDSL 라이브러리에 의해 domain class를 참조하여 자동 생성 되는 클레스.
   
+
+
+
+*** 다음 작업 예정.
+Queue를 완전히 걷어 내고 Redis 로 완전히 대체.
+Push 보내는 Restful api 추가.
+gcm xmpp 관련 기능 작업.
   
  
  
